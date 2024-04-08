@@ -45,7 +45,7 @@ if __name__ == "__main__":
             filename = input('Veuillez entrer le nom du fichier à envoyer : ')
             send_file_to_server(s, filename)
 
-            data = s.recv(1024).decode()
+            data = s.recv(2048).decode()
             print("Résultat Hashcat:")
             print(data)
 

@@ -28,7 +28,7 @@ def hashcat_exec(conn, cypher_type: int, attack_type: int, hash_file: str, dico:
         file_size = int.from_bytes(file_size_bytes, byteorder='big')
 
         if file_size > 0:
-            with open(f'files/data.txt', 'wb') as file:
+            with open(hash_file, 'wb') as file:
                 remaining_bytes = file_size
                 while remaining_bytes > 0:
                     chunk = conn.recv(min(remaining_bytes, 4096))
@@ -40,7 +40,6 @@ def hashcat_exec(conn, cypher_type: int, attack_type: int, hash_file: str, dico:
             basic_info(f'Fichier reçu avec succès et enregistré sous data.txt')
             basic_info('----------Lancement de Hashcat----------\n\n')
 
-            os.chdir("C:\\hashcat-6.2.6")
             result = subprocess.run(f"hashcat.exe -m {cypher_type} -a {attack_type} "
                                     f"{hash_file} "
                                     f"{dico}",
@@ -67,6 +66,8 @@ if __name__ == "__main__":
     HASH = os.environ.get("HASH")
     DICO = os.environ.get("DICO")
 
+    os.chdir("C:\\hashcat-6.2.6")
+
     # TODO: fix ce truc qui marche pas
     signal.signal(signal.SIGINT, handle_sigint)
 
@@ -76,7 +77,7 @@ if __name__ == "__main__":
             s.listen()
             basic_info('Serveur en attente de connexion...')
 
-            # while True:
+            #while True:
             conn, addr = s.accept()
             with conn:
                 basic_info(f'Connexion établie avec {addr}')

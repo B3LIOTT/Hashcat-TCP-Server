@@ -10,4 +10,4 @@ def severe_info(info):
 
 
 def error(err):
-    sys.stderr.write(f"[!] ERREUR: {err}")
+    print(f"[!] ERREUR: {err}")
