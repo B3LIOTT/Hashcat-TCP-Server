@@ -1,0 +1,6 @@
+.venv
+
+dictionnaries/*
+
+.env
+client/.env

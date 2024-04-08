@@ -4,6 +4,7 @@ import subprocess
 import signal
 import sys
 from logger import *
+from dotenv import load_dotenv
 
 
 def handle_sigint(sig, frame):
@@ -21,7 +22,7 @@ def getHashcatParams(conn):
     return cypher_type, attack_type
 
 
-def hashcat_exec(conn, cypher_type: int, attack_type: int):
+def hashcat_exec(conn, cypher_type: int, attack_type: int, hash_file: str, dico: str):
     try:
         file_size_bytes = conn.recv(4)
         file_size = int.from_bytes(file_size_bytes, byteorder='big')
@@ -41,8 +42,8 @@ def hashcat_exec(conn, cypher_type: int, attack_type: int):
 
             os.chdir("C:\\hashcat-6.2.6")
             result = subprocess.run(f"hashcat.exe -m {cypher_type} -a {attack_type} "
-                                    f"D:\\Users\\Eliott\\Documents\\Cyber\\Projet\\HashcatServer\\files\\data.txt "
-                                    f"D:\\Users\\Eliott\\Documents\\Cyber\\Projet\\HashcatServer\\dictionnaries\\rockyou.txt",
+                                    f"{hash_file} "
+                                    f"{dico}",
                                     shell=True, capture_output=True, text=True)
 
             print(result.stdout)
@@ -58,8 +59,13 @@ def hashcat_exec(conn, cypher_type: int, attack_type: int):
 
 
 if __name__ == "__main__":
-    HOST = '192.168.1.17'
-    PORT = 32777
+    load_dotenv()
+
+    HOST = os.environ.get("HOST")
+    PORT = int(os.environ.get("PORT"))
+
+    HASH = os.environ.get("HASH")
+    DICO = os.environ.get("DICO")
 
     # TODO: fix ce truc qui marche pas
     signal.signal(signal.SIGINT, handle_sigint)
@@ -75,7 +81,7 @@ if __name__ == "__main__":
             with conn:
                 basic_info(f'Connexion établie avec {addr}')
                 cypher_type, attack_type = getHashcatParams(conn)
-                hashcat_exec(conn, cypher_type, attack_type)
+                hashcat_exec(conn, cypher_type, attack_type, HASH, DICO)
 
         except Exception as e:
             error(e)
