@@ -47,7 +47,10 @@ if __name__ == "__main__":
 
             data = s.recv(4096).decode()
             print("\n\nRésultat Hashcat:")
-            print(data)
+            
+            while data:
+                print(data)
+                data = s.recv(4096).decode()
 
         except Exception as e:
             sys.stderr.write(f"Erreur: {e}")

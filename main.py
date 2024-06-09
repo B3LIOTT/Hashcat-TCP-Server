@@ -1,7 +1,7 @@
 import os
 import socket
 import subprocess
-import signal
+import re
 import sys
 from logger import *
 from dotenv import load_dotenv
@@ -41,9 +41,20 @@ def hashcat_exec(conn, cypher_type: int, attack_type: int, hash_file: str, dico:
                                     f"{dico}",
                                     shell=True, capture_output=True, text=True)
 
-            print(result.stdout)
-
-            conn.sendall(result.stdout.encode())
+            res = result.stdout
+            already_donne_pattern = r"Use --show to display them"
+            if re.search(already_donne_pattern, res):
+                basic_info('Hash déjà cracké, affichage des résultats...')
+                result = subprocess.run(f"hashcat.exe -m {cypher_type} -a {attack_type} "
+                                        f"{hash_file} "
+                                        f"{dico} --show",
+                                        shell=True, capture_output=True, text=True)
+            
+            res = result.stdout
+            print(res)
+            res_encoded = res.encode()
+            for i in range(0, len(res_encoded), 4096):
+                conn.sendall(res_encoded[i:i+4096])
 
         else:
             error("Taille de fichier reçue nulle")
