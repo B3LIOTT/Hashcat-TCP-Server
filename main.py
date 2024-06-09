@@ -61,8 +61,9 @@ if __name__ == "__main__":
 
     HASH = os.environ.get("HASH")
     DICO = os.environ.get("DICO")
+    HASHCAT_PATH = os.environ.get("HASHCAT_PATH")
 
-    os.chdir("C:\\hashcat-6.2.6")
+    os.chdir(HASHCAT_PATH)
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
