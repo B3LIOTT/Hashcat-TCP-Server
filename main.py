@@ -66,7 +66,7 @@ def hashcat_exec(conn, cypher_type: int, attack_type: int, hash_file: str, dico:
             print(f"hashcat.exe -m {cypher_type} -a {attack_type} "
                 f"{hash_file} "
                 f"{param}")
-            exit(0)
+ 
             result = subprocess.run(f"hashcat.exe -m {cypher_type} -a {attack_type} "
                 f"{hash_file} "
                 f"{param}",
