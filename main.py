@@ -5,6 +5,7 @@ import re
 import sys
 from logger import *
 from dotenv import load_dotenv
+from port_forwarding import forward_port, remove_forwarding
 
 
 
@@ -74,8 +75,14 @@ if __name__ == "__main__":
     DICO = os.environ.get("DICO")
     HASHCAT_PATH = os.environ.get("HASHCAT_PATH")
 
-    os.chdir(HASHCAT_PATH)
+    try:
+        forwarding_data = forward_port(port=PORT)
+    except Exception as e:
+        error(e)
+        sys.exit(1)
 
+    os.chdir(HASHCAT_PATH)
+    print("\n\n")
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
             s.bind((HOST, PORT))
@@ -91,6 +98,9 @@ if __name__ == "__main__":
 
         except KeyboardInterrupt:
             severe_info('Arrêt du serveur...')
+            remove_forwarding(*forwarding_data)
             sys.exit(0)
         except Exception as e:
             error(e)
+    
+    remove_forwarding(*forwarding_data)
