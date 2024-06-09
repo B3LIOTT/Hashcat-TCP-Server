@@ -7,10 +7,6 @@ from logger import *
 from dotenv import load_dotenv
 
 
-def handle_sigint(sig, frame):
-    severe_info('Arrêt du serveur...')
-    sys.exit(0)
-
 
 def getHashcatParams(conn):
     cypher_type_bytes = conn.recv(4)
@@ -60,16 +56,13 @@ def hashcat_exec(conn, cypher_type: int, attack_type: int, hash_file: str, dico:
 if __name__ == "__main__":
     load_dotenv()
 
-    HOST = os.environ.get("HOST")
+    HOST = socket.gethostbyname(socket.gethostname())
     PORT = int(os.environ.get("PORT"))
 
     HASH = os.environ.get("HASH")
     DICO = os.environ.get("DICO")
 
     os.chdir("C:\\hashcat-6.2.6")
-
-    # TODO: fix ce truc qui marche pas
-    signal.signal(signal.SIGINT, handle_sigint)
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         try:
@@ -84,5 +77,8 @@ if __name__ == "__main__":
                 cypher_type, attack_type = getHashcatParams(conn)
                 hashcat_exec(conn, cypher_type, attack_type, HASH, DICO)
 
+        except KeyboardInterrupt:
+            severe_info('Arrêt du serveur...')
+            sys.exit(0)
         except Exception as e:
             error(e)
