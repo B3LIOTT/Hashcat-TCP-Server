@@ -32,8 +32,8 @@ def send_file_to_server(s, filename:str):
 if __name__ == "__main__":
     load_dotenv()
 
-    HOST = os.environ.get("CLIENT_HOST")
-    PORT = int(os.environ.get("CLIENT_PORT"))
+    HOST = os.environ.get("SERVER_HOST")
+    PORT = int(os.environ.get("SERVER_PORT"))
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         cypher_type = input('Veuillez entrer le type de chiffrement : ')
