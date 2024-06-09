@@ -15,8 +15,17 @@ def send_hashcat_params(s):
         s.sendall(cypher_type.to_bytes(4, byteorder='big'))
 
         attack_type = int(input('Veuillez entrer le type d\'attaque : '))
-        s.sendall(attack_type.to_bytes(4, byteorder='big'))
-        print('Paramètres envoyé avec succès au serveur')
+        if attack_type == 0:
+            s.sendall(attack_type.to_bytes(4, byteorder='big'))
+        elif attack_type == 3:
+            s.sendall(attack_type.to_bytes(4, byteorder='big'))
+            brute_force_pattern = input('Veuillez entrer le motif de force brute : ')
+            s.sendall(brute_force_pattern.encode())
+        else:
+            sys.stderr.write('Erreur: Type d\'attaque non supporté')
+            sys.exit(1)
+
+        print('Paramètres envoyés avec succès au serveur')
 
     except Exception as e:
         sys.stderr.write(f"Erreur: {e}")

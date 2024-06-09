@@ -11,6 +11,13 @@ from port_forwarding import forward_port, remove_forwarding
 class Shutdown(Exception):
     pass
 
+
+def getBruteForcePattern(conn):
+    pattern = conn.recv(1024)
+    pattern = pattern.decode()
+    return pattern
+
+
 def getHashcatParams(conn):
     sutdown = conn.recv(4)
     if sutdown == b'O':
@@ -42,19 +49,33 @@ def hashcat_exec(conn, cypher_type: int, attack_type: int, hash_file: str, dico:
 
             basic_info(f'Fichier reçu avec succès et enregistré sous data.txt')
             basic_info('----------Lancement de Hashcat----------\n\n')
-
-            result = subprocess.run(f"hashcat.exe -m {cypher_type} -a {attack_type} "
+            if attack_type == 0:
+                 result = subprocess.run(f"hashcat.exe -m {cypher_type} -a {attack_type} "
                                     f"{hash_file} "
                                     f"{dico}",
                                     shell=True, capture_output=True, text=True)
+                 
+            elif attack_type == 3:
+                brute_force_pattern = getBruteForcePattern(conn)
+                result = subprocess.run(f"hashcat.exe -m {cypher_type} -a {attack_type} "
+                                    f"{hash_file} "
+                                    f"{brute_force_pattern}",
+                                    shell=True, capture_output=True, text=True)
+
+            else:
+                severe_info('Type d\'attaque non supporté')
+                conn.sendall(b'ERROR')
+                return
+            
 
             res = result.stdout
             already_donne_pattern = r"Use --show to display them"
             if re.search(already_donne_pattern, res):
                 basic_info('Hash déjà cracké, affichage des résultats...')
+                param = dico if attack_type == 0 else brute_force_pattern
                 result = subprocess.run(f"hashcat.exe -m {cypher_type} -a {attack_type} "
                                         f"{hash_file} "
-                                        f"{dico} --show",
+                                        f"{param} --show",
                                         shell=True, capture_output=True, text=True)
             
             res = result.stdout
