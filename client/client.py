@@ -11,10 +11,10 @@ def send_hashcat_params(s):
         if shutdown == 'O':
             sys.exit(0)
 
-        cypher_type = input('Veuillez entrer le type de chiffrement : ')
+        cypher_type = int(input('Veuillez entrer le type de chiffrement : '))
         s.sendall(cypher_type.to_bytes(4, byteorder='big'))
 
-        attack_type = input('Veuillez entrer le type d\'attaque : ')
+        attack_type = int(input('Veuillez entrer le type d\'attaque : '))
         s.sendall(attack_type.to_bytes(4, byteorder='big'))
         print('Paramètres envoyé avec succès au serveur')
 
