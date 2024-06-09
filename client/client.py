@@ -4,9 +4,17 @@ import os
 from dotenv import load_dotenv
 
 
-def send_hashcat_params(s, cypher_type:int, attack_type:int):
+def send_hashcat_params(s):
     try:
+        shutdown = input('Voulez-vous arrêter le serveur ? (O/N) : ').capitalize()
+        s.sendall(shutdown.encode())
+        if shutdown == 'O':
+            sys.exit(0)
+
+        cypher_type = input('Veuillez entrer le type de chiffrement : ')
         s.sendall(cypher_type.to_bytes(4, byteorder='big'))
+
+        attack_type = input('Veuillez entrer le type d\'attaque : ')
         s.sendall(attack_type.to_bytes(4, byteorder='big'))
         print('Paramètres envoyé avec succès au serveur')
 
@@ -36,11 +44,9 @@ if __name__ == "__main__":
     PORT = int(os.environ.get("SERVER_PORT"))
 
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        cypher_type = input('Veuillez entrer le type de chiffrement : ')
-        attack_type = input('Veuillez entrer le type d\'attaque : ')
         try:
             s.connect((HOST, PORT))
-            send_hashcat_params(s, int(cypher_type), int(attack_type))
+            send_hashcat_params(s)
 
             filename = input('Veuillez entrer le nom du fichier à envoyer : ')
             send_file_to_server(s, filename)

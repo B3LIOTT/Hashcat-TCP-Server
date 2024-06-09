@@ -8,8 +8,14 @@ from dotenv import load_dotenv
 from port_forwarding import forward_port, remove_forwarding
 
 
+class Shutdown(Exception):
+    pass
 
 def getHashcatParams(conn):
+    sutdown = conn.recv(4)
+    if sutdown == b'O':
+        raise Shutdown('Shutdown signal received')
+    
     cypher_type_bytes = conn.recv(4)
     cypher_type = int.from_bytes(cypher_type_bytes, byteorder='big')
 
@@ -76,6 +82,11 @@ if __name__ == "__main__":
     HASHCAT_PATH = os.environ.get("HASHCAT_PATH")
 
     try:
+        remove_forwarding(*forward_port(PORT))
+    except Exception as e:
+        error(e)
+
+    try:
         forwarding_data = forward_port(port=PORT)
     except Exception as e:
         error(e)
@@ -96,6 +107,10 @@ if __name__ == "__main__":
                     cypher_type, attack_type = getHashcatParams(conn)
                     hashcat_exec(conn, cypher_type, attack_type, HASH, DICO)
 
+        except Shutdown:
+            severe_info('Arrêt du serveur...')
+            remove_forwarding(*forwarding_data)
+            sys.exit(0)
         except KeyboardInterrupt:
             severe_info('Arrêt du serveur...')
             remove_forwarding(*forwarding_data)
