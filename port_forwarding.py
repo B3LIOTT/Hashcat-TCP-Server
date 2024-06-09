@@ -67,8 +67,3 @@ def remove_forwarding(service, external_port: int, protocol: str):
     except Exception as e:
         raise Exception(f"Erreur lors de la suppression de la redirection de port: {e}")
 
-
-if __name__ == "__main__":
-    data = forward_port(32777)
-    sleep(5)
-    remove_forwarding(*data)
