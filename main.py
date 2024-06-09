@@ -70,12 +70,12 @@ if __name__ == "__main__":
             s.listen()
             basic_info('Serveur en attente de connexion...')
 
-            #while True:
-            conn, addr = s.accept()
-            with conn:
-                basic_info(f'Connexion établie avec {addr}')
-                cypher_type, attack_type = getHashcatParams(conn)
-                hashcat_exec(conn, cypher_type, attack_type, HASH, DICO)
+            while True:
+                conn, addr = s.accept()
+                with conn:
+                    basic_info(f'Connexion établie avec {addr}')
+                    cypher_type, attack_type = getHashcatParams(conn)
+                    hashcat_exec(conn, cypher_type, attack_type, HASH, DICO)
 
         except KeyboardInterrupt:
             severe_info('Arrêt du serveur...')
